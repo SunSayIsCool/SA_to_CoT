@@ -1,7 +1,7 @@
-package sample;
+package SaToCoT;
 
 public class Launcher {
     public static void main(String[] args) throws Exception {
-        sample.Main.main(args);
+        SaToCoT.Main.main(args);
     }
 }

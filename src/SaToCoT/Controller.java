@@ -1,4 +1,4 @@
-package sample;
+package SaToCoT;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;

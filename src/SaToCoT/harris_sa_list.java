@@ -1,4 +1,4 @@
-package sample;
+package SaToCoT;
 
 public class harris_sa_list {
 

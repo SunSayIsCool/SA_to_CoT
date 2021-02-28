@@ -1,4 +1,4 @@
-package sample;
+package SaToCoT;
 
 public class moto_sa_list {
 
