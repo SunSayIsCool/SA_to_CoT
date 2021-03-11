@@ -1,5 +1,6 @@
 package SaToCoT;
 
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -34,32 +35,69 @@ public class Controller {
 
     private ObservableList<harris_sa_list> harris_list = FXCollections.observableArrayList();
     private ObservableList<moto_sa_list> moto_list = FXCollections.observableArrayList();
-    private ObservableList<String> team_list = FXCollections.observableArrayList("White", "Yellow", "Orange", "Magenta", "Red", "Maroon", "Purple", "Dark Blue", "Blue", "Cyan", "Teal", "Green", "Dark Green", "Brown");
-    private ObservableList<String> role_list = FXCollections.observableArrayList("Team Member", "Team Lead", "HQ", "Sniper", "Medic", "Forward Observer", "RTO", "K9");
+    private ObservableList<String> domain_list = FXCollections.observableArrayList("AIR CIV","AIR MIL","GROUND SENSORS","GROUND VEHICLE","GROUND WEAPON","GROUND UNIT COMBAT","GROUND UNIT SERVICE SUPPORT","GROUND UNIT COMBAT SUPPORT","SURFACE","SUBSURFACE","SOF");
+    private ObservableList<String> air_civ_list = FXCollections.observableArrayList("Air Civ", "Fixed", "Rotary", "Blimp");
+    private ObservableList<String> air_mil_list = FXCollections.observableArrayList("Fixed","Fixed/Attack","Fixed/Bomber","Fixed/Transport","Fixed/C2","Fixed/Fighter","Fixed/Interceptor","Fixed/CSAR","Fixed/Jammer",
+                                                                                           "Fixed/Tanker","Fixed/VSTOL","Fixed/SOF","Fixed/MEDEVAC","Fixed/Patrol","Fixed/UAV","Fixed/RECON","Fixed/Trainer","Fixed/Utility",
+                                                                                            "Fixed/C3I","Rotor","Rotor/Attack","Rotor/Transport","Rotor/C2","Rotor/CSAR","Rotor/Jammer","Rotor/SOF","Rotor/MEDEVAC","Rotor/UAV","Rotor/RECON","Rotor/Utility","Blimp");
+    private ObservableList<String> gnd_sens_list = FXCollections.observableArrayList("Sensor","Emplaced","Radar");
+    private ObservableList<String> gnd_vech_list = FXCollections.observableArrayList("Vehicle","Armor/Gun","Apc","Apc/Recovery","C2V/ACV","Armor/Infantry",
+                                                                                            "Armor/Light","Armor/Combat Service Support","Tank","Civilian","Engineer",
+                                                                                            "Mine Clearing Vehicle","Utility","Bus","Cross Country Truck","Boat","Semi","Ambulance");
+    private ObservableList<String> gnd_weap_list = FXCollections.observableArrayList("Weapon","Air Defense Gun","DirectFire","AnitTankGun","Howitzer","MissileLauncher",
+                                                                                            "Mortar","Rifle","Automatic Weapon","Light Machine Gun","Heavy Machine Gun",
+                                                                                            "RocketLauncher/Single","RocketLauncher/Multiple","RocketLauncher/AntiTank","Flame Thrower","Nbc Equipment");
+    private ObservableList<String> gnd_unt_cbt_list = FXCollections.observableArrayList("Combat","ARMOR","ANTI ARMOR","ANTI ARMOR, ARMORED AIR ASSAULT","ANTI ARMOR, ARMORED TRACKED",
+                                                                                                "ANTI ARMOR, ARMORED WHEELED","ANTI ARMOR, AIRBORNE","ANTI ARMOR, MOTORIZED","ARMOR TRACK","ARMOR TRACK AMPHIBIOUS",
+                                                                                                "ARMOR, WHEELED","ARMOR, WHEELED AIRBORNE","ARMOR, WHEELED RECOVERY","ARMOR, WHEELED AMPHIBIOUS","AIR DEFENSE","AIR DEFENSE MISSILE",
+                                                                                                "Engineer/ENGINEER","Artillery (Fixed)","MORTAR","ROCKET","SINGLE ROCKET SELF PROPELLED","MULTI ROCKET SELF PROPELLED","Infantry/Troops",
+                                                                                                "Infantry/Airborne","Infantry/Fighting Vehicle","Infantry/Motorized","Infantry/Naval","Infantry/Air Assault","Infantry/Mountain","Infantry/Mechanized",
+                                                                                                "MISSILE (SURF SURF)","Recon","Recon/AIRBORNE","Recon/MOUNTAIN","Recon/MARINE","Recon/AIR ASSAULT","INTERNAL SECURITY FORCES","Aviation/AVIATION",
+                                                                                                "Aviation/COMPOSITE","Aviation/FIXED WING","Aviation/ROTARY WING");
+    private ObservableList<String> gnd_unt_ss_list = FXCollections.observableArrayList("C2 HEADQUARTERS COMPONENT","MEDICAL","SUPPLY","TRANSPORTATION","MAINTENANCE","MAINTENANCE RECOVERY");
+    private ObservableList<String> gnd_unt_cs_list = FXCollections.observableArrayList("COMBAT SUPPORT","COMBAT SUPPORT NBC","BIOLOGICAL","CHEMICAL","NUCLEAR","EXPLOSIVE ORDINANCE DISPOSAL",
+                                                                                                "INFORMATION WARFARE UNIT","LAW ENFORCEMENT UNIT","CIVILIAN LAW ENFORCEMENT","MILITARY POLICE","MILITARY INTELLIGENCE",
+                                                                                                "COUNTER INTELLIGENCE","SIGNAL INTELLIGENCE (SIGINT)","ELECTRONIC WARFARE","SIGNAL UNIT","COMMAND OPERATIONS","RADIO UNIT",
+                                                                                                "TACTICAL SATELLITE","RELAY","TELEPHONE SWITCH");
+    private ObservableList<String> sfc_list = FXCollections.observableArrayList("SEA SURFACE TRACK","COMBATANT","AMPHIBIOUS WARFARE SHIP","ASSAULT VESSEL","LANDING CRAFT",
+                                                                                        "LANDING SHIP","HOVERCRAFT","LINE","BATTLESHIP","CRUISER","CARRIER","DESTROYER","FRIGATE/CORVETTE",
+                                                                                        "MINE WARFARE VESSEL","MINEHUNTER","MINELAYER","PATROL","ANTISUBMARINE WARFARE","ANTISURFACE WARFARE",
+                                                                                        "CONVOY","HOSPITAL SHIP","RESCUE","NON MILITARY","CARGO","PASSENGER","TANKER");
+    private ObservableList<String> sub_sfc_list = FXCollections.observableArrayList("SUBSURFACE TRACK","DIVER","SUBMARINE","SUBMARINE CONVENTIONAL PROPULSION","SUBMARINE NUCLEAR PROPULSION","UNMANNED UNDERWATER VEHICLE (UUV)");
+    private ObservableList<String> sof_list = FXCollections.observableArrayList("AVIATION Fixed","AVIATION Rotary","AVIATION CSAR","NAVAL","SPECIAL BOAT","SPECIAL SSNR","GROUND","RANGER","PSYOPS","SUPPORT");
+
+
+
 
     @FXML
-    private TableView<harris_sa_list> sign_role_team_tbl_view;
+    private TableView<harris_sa_list> harris_sa_tbl_view;
 
     @FXML
     private TableColumn<harris_sa_list, String> callsign_harris;
 
     @FXML
-    private TableColumn<harris_sa_list, String> team_harris;
+    private TableColumn<harris_sa_list, String> domain_harris;
 
     @FXML
-    private TableColumn<harris_sa_list, String> role_harris;
+    private TableColumn<harris_sa_list, String> unit_harris;
 
     @FXML
-    private TableView<moto_sa_list> moto_sign_role_team_tbl_view;
+    private TableColumn<harris_sa_list, String> alias_harris;
+
+    @FXML
+    private TableView<moto_sa_list> moto_sa_tbl_view;
 
     @FXML
     private TableColumn<moto_sa_list, String> radioid_moto;
 
     @FXML
-    private TableColumn<moto_sa_list, String> team_moto;
+    private TableColumn<moto_sa_list, String> domain_moto;
 
     @FXML
-    private TableColumn<moto_sa_list, String> role_moto;
+    private TableColumn<moto_sa_list, String> unit_moto;
+
+    @FXML
+    private TableColumn<moto_sa_list, String> alias_moto;
 
     @FXML
     private TextField moto_radioid_txt;
@@ -71,10 +109,10 @@ public class Controller {
     private Button moto_del_btn;
 
     @FXML
-    private ComboBox<String> moto_team_cb;
+    private ComboBox<String> moto_domain_cb;
 
     @FXML
-    private ComboBox<String> moto_role_cb;
+    private ComboBox<String> moto_unit_cb;
 
     @FXML
     private TextField harris_sign_txt;
@@ -86,10 +124,10 @@ public class Controller {
     private Button harris_del_btn;
 
     @FXML
-    private ComboBox<String> harris_team_cb;
+    private ComboBox<String> harris_domain_cb;
 
     @FXML
-    private ComboBox<String> harris_role_cb;
+    private ComboBox<String> harris_unit_cb;
 
     @FXML
     private TextArea log_tx;
@@ -124,45 +162,49 @@ public class Controller {
     @FXML
     private Slider sld_stale;
 
-    Boolean l = false; //send local sa or not
-    Boolean m = false; //send multicast sa or not
+    @FXML
+    private TextField harris_alias_txt;
 
     @FXML
-    void initialize() throws IOException,FileNotFoundException{
-        String timestamp = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
+    private TextField moto_alias_txt;
+
+    Boolean l; //send local sa or not
+    Boolean m; //send multicast sa or not
+    String version = "1.1";
+
+    @FXML
+    void initialize() throws IOException, FileNotFoundException {
+
+        String timestamp = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
         String timestamp_file = new SimpleDateFormat("HHmm_dd-MM-yyyy").format(new Date());
+
+        //logging to textarea
+        Platform.runLater(() -> {log_tx.appendText("-------------------------[" + timestamp + "]-------------------------");});
+        addLog(" - App started"); //logging to console
+
         //Initializing tables and comboboxes
         initData();
         readCSV();
 
-        callsign_harris.setCellValueFactory(new PropertyValueFactory<harris_sa_list, String>("callsign"));
-        team_harris.setCellValueFactory(new PropertyValueFactory<harris_sa_list, String>("team"));
-        role_harris.setCellValueFactory(new PropertyValueFactory<harris_sa_list, String>("role"));
-        sign_role_team_tbl_view.setItems(harris_list);
-
-        radioid_moto.setCellValueFactory(new PropertyValueFactory<moto_sa_list, String>("RadioId"));
-        team_moto.setCellValueFactory(new PropertyValueFactory<moto_sa_list, String>("team"));
-        role_moto.setCellValueFactory(new PropertyValueFactory<moto_sa_list, String>("role"));
-        moto_sign_role_team_tbl_view.setItems(moto_list);
-
         // Stale slider listener
-        sld_stale.valueProperty().addListener(new ChangeListener<Number>(){
+        sld_stale.valueProperty().addListener(new ChangeListener<Number>() {
 
-            public void changed(ObservableValue<? extends Number> changed, Number oldValue, Number newValue){
+            public void changed(ObservableValue<? extends Number> changed, Number oldValue, Number newValue) {
                 int stale_int = newValue.intValue();
                 lbl_stale.setText(String.valueOf(stale_int));
             }
         });
 
         //Setting choose of harris rows
-        TableView.TableViewSelectionModel<harris_sa_list> selectionModel = sign_role_team_tbl_view.getSelectionModel();
+        TableView.TableViewSelectionModel<harris_sa_list> selectionModel = harris_sa_tbl_view.getSelectionModel();
         selectionModel.selectedItemProperty().addListener(new ChangeListener<harris_sa_list>() {
             @Override
-            public void changed(ObservableValue<? extends harris_sa_list> val, harris_sa_list oldVal, harris_sa_list newVal){
-                if(newVal != null) {
+            public void changed(ObservableValue<? extends harris_sa_list> val, harris_sa_list oldVal, harris_sa_list newVal) {
+                if (newVal != null) {
                     harris_sign_txt.setText(newVal.getCallsign());
-                    harris_team_cb.setValue(newVal.getTeam());
-                    harris_role_cb.setValue(newVal.getRole());
+                    harris_domain_cb.setValue(newVal.getDomain());
+                    harris_unit_cb.setValue(newVal.getItem());
+                    harris_alias_txt.setText(newVal.getAlias());
                 }
 
             }
@@ -170,26 +212,24 @@ public class Controller {
         //-------------------
 
         //Setting choose of harris rows
-        TableView.TableViewSelectionModel<moto_sa_list> selectionModel_moto = moto_sign_role_team_tbl_view.getSelectionModel();
+        TableView.TableViewSelectionModel<moto_sa_list> selectionModel_moto = moto_sa_tbl_view.getSelectionModel();
         selectionModel_moto.selectedItemProperty().addListener(new ChangeListener<moto_sa_list>() {
             @Override
-            public void changed(ObservableValue<? extends moto_sa_list> val, moto_sa_list oldVal, moto_sa_list newVal){
-                if(newVal != null) {
+            public void changed(ObservableValue<? extends moto_sa_list> val, moto_sa_list oldVal, moto_sa_list newVal) {
+                if (newVal != null) {
                     moto_radioid_txt.setText(newVal.getRadioId());
-                    moto_team_cb.setValue(newVal.getTeam());
-                    moto_role_cb.setValue(newVal.getRole());
+                    moto_domain_cb.setValue(newVal.getDomain());
+                    moto_unit_cb.setValue(newVal.getItem());
+                    moto_alias_txt.setText(newVal.getAlias());
                 }
 
             }
         });
         //-------------------
 
-        log_tx.appendText("[" + timestamp+  "] - App started\n"); //logging to textarea
-        System.out.println("[" + timestamp+  "] - App started"); //logging to console
-
         //Add/modify Harris SA list
         harris_add_btn.setOnAction(ActionEvent -> {
-            harris_list.add(new harris_sa_list(harris_sign_txt.getText(), harris_team_cb.getValue(), harris_role_cb.getValue()));
+            harris_list.add(new harris_sa_list(harris_sign_txt.getText(), harris_domain_cb.getValue(), harris_unit_cb.getValue(), harris_alias_txt.getText()));
             try {
                 save_db_harris();
             } catch (Exception e) {
@@ -197,11 +237,10 @@ public class Controller {
             }
 
         });
-        //-------------------
 
         //Add/modify MotoTRBO SA list
         moto_add_btn.setOnAction(ActionEvent -> {
-            moto_list.add(new moto_sa_list(moto_radioid_txt.getText(), moto_team_cb.getValue(), moto_role_cb.getValue()));
+            moto_list.add(new moto_sa_list(moto_radioid_txt.getText(), moto_domain_cb.getValue(), moto_unit_cb.getValue(), moto_alias_txt.getText()));
             try {
                 save_db_moto();
             } catch (Exception e) {
@@ -213,7 +252,7 @@ public class Controller {
 
         //Delete Harris SA item
         harris_del_btn.setOnAction(ActionEvent -> {
-            sign_role_team_tbl_view.getItems().removeAll(sign_role_team_tbl_view.getSelectionModel().getSelectedItems());
+            harris_sa_tbl_view.getItems().removeAll(harris_sa_tbl_view.getSelectionModel().getSelectedItems());
             try {
                 save_db_harris();
             } catch (Exception e) {
@@ -224,7 +263,7 @@ public class Controller {
 
         //Delete MotoTRBO SA item
         moto_del_btn.setOnAction(ActionEvent -> {
-            moto_sign_role_team_tbl_view.getItems().removeAll(moto_sign_role_team_tbl_view.getSelectionModel().getSelectedItems());
+            moto_sa_tbl_view.getItems().removeAll(moto_sa_tbl_view.getSelectionModel().getSelectedItems());
             try {
                 save_db_moto();
             } catch (Exception e) {
@@ -242,23 +281,21 @@ public class Controller {
                 start_stop_btn.setText("Stop");
                 status_lbl.setText("Forwarder runned");
                 status_lbl.setTextFill(Color.web("#808000"));
-                System.out.println("[" + timestamp+  "] - Forwarder started");
-                log_tx.appendText("[" + timestamp+  "] - Forwarder started\n");
-            }
-            else if(start_stop_btn.getText().equals("Stop")){
+                addLog(" - Forwarder started");
+
+            } else if (start_stop_btn.getText().equals("Stop")) {
                 l = false;
                 m = false;
                 start_stop_btn.setText("Start");
                 status_lbl.setText("Forwarder stopped");
                 status_lbl.setTextFill(Color.web("#FF0000"));
-                System.out.println("[" + timestamp+  "] - Forwarder stopped (receiving last packets)");
-                log_tx.appendText("[" + timestamp+  "] - Forwarder stopped (receiving last packets)\n");
+                addLog(" - Forwarder stopped (receiving last packets)");
+
             }
 
             try {
                 recieve_UDP();
-            }
-            catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 
@@ -273,88 +310,197 @@ public class Controller {
 
         //Saving log to file
         log_save_btn.setOnAction(ActionEvent -> {
-           try {
-               ObservableList<CharSequence> paragraph = log_tx.getParagraphs();
-               Iterator<CharSequence> iter = paragraph.iterator();
-               BufferedWriter bf = new BufferedWriter(new FileWriter(new File("log_[" + timestamp_file+  "].log")));
-               while(iter.hasNext())
-               {
-                   CharSequence seq = iter.next();
-                   bf.append(seq);
-                   bf.newLine();
-               }
-               bf.flush();
-               bf.close();
-           }
-           catch (IOException e){
-               e.printStackTrace();
-           }
+            try {
+                ObservableList<CharSequence> paragraph = log_tx.getParagraphs();
+                Iterator<CharSequence> iter = paragraph.iterator();
+                BufferedWriter bf = new BufferedWriter(new FileWriter(new File("log_[" + timestamp_file + "].log")));
+                while (iter.hasNext()) {
+                    CharSequence seq = iter.next();
+                    bf.append(seq);
+                    bf.newLine();
+                }
+                bf.flush();
+                bf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        //-------------------
+    }
+
+    private void initData() {
+        //Initializing Harris SA table
+        harris_domain_cb.setItems(domain_list);
+        harris_unit_cb.setItems(air_civ_list);
+        harris_domain_cb.setValue("AIR CIV");
+        harris_unit_cb.setValue("Air Civ");
+        moto_domain_cb.setItems(domain_list);
+        moto_unit_cb.setItems(air_civ_list);
+        moto_domain_cb.setValue("AIR CIV");
+        moto_unit_cb.setValue("Air Civ");
+
+        callsign_harris.setCellValueFactory(new PropertyValueFactory<harris_sa_list, String>("callsign"));
+        domain_harris.setCellValueFactory(new PropertyValueFactory<harris_sa_list, String>("domain"));
+        unit_harris.setCellValueFactory(new PropertyValueFactory<harris_sa_list, String>("item"));
+        alias_harris.setCellValueFactory(new PropertyValueFactory<harris_sa_list, String>("alias"));
+        harris_sa_tbl_view.setItems(harris_list);
+
+        radioid_moto.setCellValueFactory(new PropertyValueFactory<moto_sa_list, String>("RadioId"));
+        domain_moto.setCellValueFactory(new PropertyValueFactory<moto_sa_list, String>("domain"));
+        unit_moto.setCellValueFactory(new PropertyValueFactory<moto_sa_list, String>("item"));
+        alias_moto.setCellValueFactory(new PropertyValueFactory<moto_sa_list, String>("alias"));
+        moto_sa_tbl_view.setItems(moto_list);
+
+        //Change comboboxes for HarrisSA
+        harris_domain_cb.setOnAction(event -> {
+            switch (harris_domain_cb.getValue().toString()){
+                case  ("AIR CIV"):
+                    harris_unit_cb.setItems(air_civ_list);
+                    harris_unit_cb.setValue("Air Civ");
+                    break;
+                case ("AIR MIL"):
+                    harris_unit_cb.setItems(air_mil_list);
+                    harris_unit_cb.setValue("Fixed");
+                    break;
+                case ("GROUND SENSORS"):
+                    harris_unit_cb.setItems(gnd_sens_list);
+                    harris_unit_cb.setValue("Sensor");
+                    break;
+                case ("GROUND VEHICLE"):
+                    harris_unit_cb.setItems(gnd_vech_list);
+                    harris_unit_cb.setValue("Vehicle");
+                    break;
+                case ("GROUND WEAPON"):
+                    harris_unit_cb.setItems(gnd_weap_list);
+                    harris_unit_cb.setValue("Weapon");
+                    break;
+                case ("GROUND UNIT COMBAT"):
+                    harris_unit_cb.setItems(gnd_unt_cbt_list);
+                    harris_unit_cb.setValue("Combat");
+                    break;
+                case ("GROUND UNIT SERVICE SUPPORT"):
+                    harris_unit_cb.setItems(gnd_unt_ss_list);
+                    harris_unit_cb.setValue("C2 HEADQUARTERS COMPONENT");
+                    break;
+                case ("GROUND UNIT COMBAT SUPPORT"):
+                    harris_unit_cb.setItems(gnd_unt_cs_list);
+                    harris_unit_cb.setValue("COMBAT SUPPORT");
+                    break;
+                case ("SURFACE"):
+                    harris_unit_cb.setItems(sfc_list);
+                    harris_unit_cb.setValue("SEA SURFACE TRACK");
+                    break;
+                case ("SUBSURFACE"):
+                    harris_unit_cb.setItems(sub_sfc_list);
+                    harris_unit_cb.setValue("SUBSURFACE TRACK");
+                    break;
+                case ("SOF"):
+                    harris_unit_cb.setItems(sof_list);
+                    harris_unit_cb.setValue("AVIATION Fixed");
+                    break;
+            }
+        });
+        //-------------------
+
+        //Change comboboxes for HarrisSA
+        moto_domain_cb.setOnAction(event -> {
+            switch (moto_domain_cb.getValue().toString()){
+                case  ("AIR CIV"):
+                    moto_unit_cb.setItems(air_civ_list);
+                    moto_unit_cb.setValue("Air Civ");
+                    break;
+                case ("AIR MIL"):
+                    moto_unit_cb.setItems(air_mil_list);
+                    moto_unit_cb.setValue("Fixed");
+                    break;
+                case ("GROUND SENSORS"):
+                    moto_unit_cb.setItems(gnd_sens_list);
+                    moto_unit_cb.setValue("Sensor");
+                    break;
+                case ("GROUND VEHICLE"):
+                    moto_unit_cb.setItems(gnd_vech_list);
+                    moto_unit_cb.setValue("Vehicle");
+                    break;
+                case ("GROUND WEAPON"):
+                    moto_unit_cb.setItems(gnd_weap_list);
+                    moto_unit_cb.setValue("Weapon");
+                    break;
+                case ("GROUND UNIT COMBAT"):
+                    moto_unit_cb.setItems(gnd_unt_cbt_list);
+                    moto_unit_cb.setValue("Combat");
+                    break;
+                case ("GROUND UNIT SERVICE SUPPORT"):
+                    moto_unit_cb.setItems(gnd_unt_ss_list);
+                    moto_unit_cb.setValue("C2 HEADQUARTERS COMPONENT");
+                    break;
+                case ("GROUND UNIT COMBAT SUPPORT"):
+                    moto_unit_cb.setItems(gnd_unt_cs_list);
+                    moto_unit_cb.setValue("COMBAT SUPPORT");
+                    break;
+                case ("SURFACE"):
+                    moto_unit_cb.setItems(sfc_list);
+                    moto_unit_cb.setValue("SEA SURFACE TRACK");
+                    break;
+                case ("SUBSURFACE"):
+                    moto_unit_cb.setItems(sub_sfc_list);
+                    moto_unit_cb.setValue("SUBSURFACE TRACK");
+                    break;
+                case ("SOF"):
+                    moto_unit_cb.setItems(sof_list);
+                    moto_unit_cb.setValue("AVIATION Fixed");
+                    break;
+            }
         });
         //-------------------
     }
 
     //Saving Harris SA list to harris_db.csv
-    private void save_db_harris() throws Exception{
+    private void save_db_harris() throws Exception {
         Writer writer = null;
         try {
             File file = new File("harris_db.csv");
             writer = new BufferedWriter(new FileWriter(file));
             for (harris_sa_list harris_sa_list : harris_list) {
 
-                String text = harris_sa_list.getCallsign() + ";" + harris_sa_list.getTeam() + ";" + harris_sa_list.getRole() + "\n";
+                String text = harris_sa_list.getCallsign() + ";" + harris_sa_list.getDomain() + ";" + harris_sa_list.getItem() + ";" + harris_sa_list.getAlias() + "\n";
 
                 writer.write(text);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-        }
-        finally {
+        } finally {
             writer.flush();
             writer.close();
         }
     }
-    private void save_db_moto() throws Exception{
+
+    //Saving Moto SA list to moto_db.csv
+    private void save_db_moto() throws Exception {
         Writer writer = null;
         try {
             File file = new File("moto_db.csv");
             writer = new BufferedWriter(new FileWriter(file));
             for (moto_sa_list moto_sa_list : moto_list) {
 
-                String text = moto_sa_list.getRadioId() + ";" + moto_sa_list.getTeam() + ";" + moto_sa_list.getRole() + "\n";
+                String text = moto_sa_list.getRadioId() + ";" + moto_sa_list.getDomain() + ";" + moto_sa_list.getItem() + ";" + moto_sa_list.getAlias()+ "\n";
 
                 writer.write(text);
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-        }
-        finally {
+        } finally {
             writer.flush();
             writer.close();
         }
     }
     //-------------------
 
-    private void initData() { //Initializing Harris SA table
-        harris_team_cb.setItems(team_list);
-        harris_role_cb.setItems(role_list);
-        harris_team_cb.setValue("White");
-        harris_role_cb.setValue("Team Member");
-        moto_team_cb.setItems(team_list);
-        moto_role_cb.setItems(role_list);
-        moto_team_cb.setValue("White");
-        moto_role_cb.setValue("Team Member");
-        //harris_list.add(new harris_sa_list("HH1", "Red", "RTO")); //- list format
-        //moto_list.add(new moto_sa_list("iiiiii","Red","jkjlj"));
-    }
-    //-------------------
-
     //Reading harris_db.csv
-    private void readCSV() throws FileNotFoundException,IOException {
+    private void readCSV() throws FileNotFoundException, IOException {
 
         String CsvFile = "harris_db.csv";
         String MotoCsvFile = "moto_db.csv";
         String FieldDelimiter = ";";
-
 
         BufferedReader br;
         BufferedReader moto_br;
@@ -365,7 +511,7 @@ public class Controller {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] fields = line.split(FieldDelimiter, -1);
-                harris_list.add(new harris_sa_list(fields[0], fields[1], fields[2]));
+                harris_list.add(new harris_sa_list(fields[0],fields[1],fields[2],fields[3]));
             }
 
             moto_br = new BufferedReader(new FileReader(MotoCsvFile));
@@ -373,7 +519,7 @@ public class Controller {
             String moto_line;
             while ((moto_line = moto_br.readLine()) != null) {
                 String[] fields = moto_line.split(FieldDelimiter, -1);
-                moto_list.add(new moto_sa_list(fields[0], fields[1], fields[2]));
+                moto_list.add(new moto_sa_list(fields[0],fields[1],fields[2],fields[3]));
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -387,19 +533,17 @@ public class Controller {
     @FXML
     private void recieve_UDP() throws IOException { //Forwarder for Harris SA service
 
-        ScheduledService<Boolean> ss = new ScheduledService<Boolean>()
-        {
+        ScheduledService<Boolean> ss = new ScheduledService<Boolean>() {
             @Override
-            protected Task<Boolean> createTask()
-            {
-                Task<Boolean> task = new Task<Boolean>()
-                {
+            protected Task<Boolean> createTask() {
+                Task<Boolean> task = new Task<Boolean>() {
                     @Override
-                    protected Boolean call() throws IOException
-                    {
+                    protected Boolean call() throws IOException {
                         HarrisSAsendCoT();
                         return true;
-                    };
+                    }
+
+                    ;
                 };
                 return task;
             }
@@ -407,92 +551,6 @@ public class Controller {
         ss.start();
     }
     //-------------------
-
-    //HarrisSAsendCoT("10011", "239.2.3.1", "6969", true, true);
-
-    // Harris SA converter code
-    @FXML
-    public void HarrisSAsendCoT() throws IOException {
-
-
-            // Create a socket to listen at port
-            DatagramSocket ds = new DatagramSocket(10011);
-            byte[] receive = new byte[65535];
-
-            DatagramPacket DpReceive = null;
-            while (true) {
-                Boolean localSA = l;
-                Boolean multiSA = m;
-
-                String team = "White";
-                String role = "Team Member";
-                if (status_lbl.getText().equals("Forwarder runned")) {
-
-                    String multicast_addr = mcast_addr_txfld.getText().toString();
-
-                    // Create a DatgramPacket to receive the data.
-                    DpReceive = new DatagramPacket(receive, receive.length);
-
-                    // Step 3 : revieve the data in byte buffer.
-                    ds.receive(DpReceive);
-                    String str = new String(receive);
-                    str = str.replaceAll("[\\u0000-\u0009]", "");
-                    int indexGPRMC = str.indexOf("$GPRMC");
-                    int indexCHKSUM = str.indexOf("*");
-
-                    if (indexGPRMC > 0 & indexCHKSUM > 0) {
-
-                        // loop for searching callsigns
-
-                        String timestamp = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
-                        String In = str;
-
-                        System.out.println("[" + timestamp+  "] - Received: from "+RMC_callsign(In)+": " + In);
-                        log_tx.appendText("[" + timestamp+  "] - Received: from "+RMC_callsign(In)+": " + In + "\n");
-                        String date = RMC_date(In);
-                        String time = RMC_time(In);
-
-                        for (Integer i=0; i<harris_list.size(); i++) {
-                            if (RMC_callsign(In).equals(harris_list.get(i).getCallsign())) {
-                                team = harris_list.get(i).getTeam();
-                                role = harris_list.get(i).getRole();
-                            }
-                        }
-
-                        System.out.println(role);
-                        System.out.println(team);
-
-                        String out_str = "<event version=\"2.0\" uid=\"HarrisSA-to-CoT-v-1-0-"+RMC_callsign(In)+"\" type=\"a-f-G-U-C\" time=\"" + convertDT_CoT(date, time) + "\" start=\"" + convertDT_CoT(date, time) + "\" stale=\"" + staleDT_CoT(date, time, Integer.parseInt(lbl_stale.getText())) + "\" how=\"m-g\">" +
-                                "<point lat=\"" + RMC_latitude(In) + "\" lon=\"" + RMC_longtitude(In) + "\" hae=\"25.0\" ce=\"5.0\" le=\"0.0\" />" +
-                                "<detail>" +
-                                "<uid Droid=\"harris_sa-RF78XX-to-CoT-" + RMC_callsign(In) + "\" />" +
-                                "<contact callsign=\"" + RMC_callsign(In) + "\" />" +
-                                "<__group name=\""+team+"\" role=\""+role+"\" />" +
-                                "<precisionlocation geopointsrc=\"Radio\" altsrc=\"Harris GPS\" />" +
-                                "<takv device=\"Radio\" platform=\"Harris\" version=\"RF 78XX\" />" +
-                                "<track speed=\"" + RMC_speed(In) + "\" course=\"" + RMC_course(In) + "\" />" +
-                                "</detail>" +
-                                "</event>";
-                        if (localSA == true){
-                            send_udp(out_str, "127.0.0.1", "6969");
-                            System.out.println("[" + timestamp+  "] -> 127.0.0.1 port:6969");
-                            log_tx.appendText("[" + timestamp+  "] -> 127.0.0.1 port:6969\n");
-                        }
-                        if (multiSA == true && multicast_addr != null){
-                            send_ms_udp(out_str, multicast_addr, "6969");
-                            System.out.println("[" + timestamp+  "] -> "+multicast_addr+" port:6969");
-                            log_tx.appendText("[" + timestamp+  "] -> "+multicast_addr+" port:6969\n");
-                        }
-                    }
-                    receive = new byte[65535]; // Clear the buffer after every message.
-                } else {
-                    ds.close();
-                    System.out.print("local "+ localSA.toString());
-                    System.out.println(" Multicast "+ multiSA.toString());
-                    break;
-                }
-            }
-    }
 
     public String checksumm(String input_str) {
         int checksum = 0;
@@ -636,36 +694,132 @@ public class Controller {
             c.add(Calendar.MINUTE, inputStale);
             Date currentDatePlusOne = c.getTime();
             DateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(currentDatePlusOne);
-        }  catch (ParseException e) {
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 
         return DateTime;
     }
 
-    public void send_udp(String input_str, String ip_addr, String port) throws IOException {
+    public void send_udp(String input_str, String ip_addr, String port) {
+        try {
+            DatagramSocket ds = new DatagramSocket();
 
-        DatagramSocket ds = new DatagramSocket();
-
-        InetAddress ip = InetAddress.getByName(ip_addr);
-        int udp_port = Integer.parseInt(port);
-        byte buf[] = null;
-        buf = input_str.getBytes();
-        DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, udp_port);
-        ds.send(DpSend);
+            InetAddress ip = InetAddress.getByName(ip_addr);
+            int udp_port = Integer.parseInt(port);
+            byte buf[] = null;
+            buf = input_str.getBytes();
+            DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, udp_port);
+            ds.send(DpSend);
+            ds.close();
+        } catch (IOException ex) {
+            System.out.println("Local error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
-    public void send_ms_udp(String input_str, String ip_addr, String port) throws IOException {
+    public void send_ms_udp(String input_str, String ip_addr, String port, int ttl) {
+        try{
+            int udp_port = Integer.parseInt(port);
+            Integer ttlByte = new Integer(ttl);
+            MulticastSocket mcast_sock = new MulticastSocket();
+            byte buf[] = null;
+            buf = input_str.getBytes();
+            DatagramPacket mc_Send = new DatagramPacket(buf, buf.length, InetAddress.getByName(ip_addr), udp_port);
+            mcast_sock.send(mc_Send, ttlByte.byteValue());
+            mcast_sock.close();
+        } catch (IOException ex) {
+            System.out.println("Multicast error: " + ex.getMessage());
+            ex.printStackTrace();
+        }
 
-        InetAddress ip = InetAddress.getByName(ip_addr);
-        int udp_port = Integer.parseInt(port);
-        int ttl = 64;
-        MulticastSocket s = new MulticastSocket();
-        byte buf[] = null;
-        buf = input_str.getBytes();
-        DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, udp_port);
-        s.send(DpSend,(byte)ttl);
-        s.close();
+    }
+
+    public void addLog (String message) {
+        String timestamp = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
+        System.out.println("[" + timestamp + "]" + message);
+        Platform.runLater(() -> {log_tx.appendText("\n[" + timestamp + "]" + message);});
+    }
+
+    // Harris SA converter code
+    @FXML
+    public void HarrisSAsendCoT() throws IOException {
+
+        // Create a socket to listen at port
+        DatagramSocket ds = new DatagramSocket(10011);
+        byte[] receive = new byte[65535];
+
+        DatagramPacket DpReceive = null;
+        while (true) {
+            Boolean localSA = l;
+            Boolean multiSA = m;
+
+            String domain = " ";
+            String item = " ";
+            String alias = "N/A";
+            if (status_lbl.getText().equals("Forwarder runned")) {
+
+                String multicast_addr = mcast_addr_txfld.getText().toString();
+
+                // Create a DatgramPacket to receive the data.
+                DpReceive = new DatagramPacket(receive, receive.length);
+
+                // Step 3 : revieve the data in byte buffer.
+                ds.receive(DpReceive);
+                String str = new String(receive);
+                str = str.replaceAll("[\\u0000-\u0009]", "");
+                int indexGPRMC = str.indexOf("$GPRMC");
+                int indexCHKSUM = str.indexOf("*");
+
+                if (indexGPRMC > 0 & indexCHKSUM > 0) {
+
+                    // loop for searching callsigns
+
+                    String timestamp = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
+                    String In = str;
+
+                    addLog(" - Received: from " + RMC_callsign(In) + ": " + In);
+                    String date = RMC_date(In);
+                    String time = RMC_time(In);
+
+                    for (Integer i = 0; i < harris_list.size(); i++) {
+                        if (RMC_callsign(In).equals(harris_list.get(i).getCallsign())) {
+                            domain = harris_list.get(i).getDomain();
+                            item = harris_list.get(i).getItem();
+                            alias = harris_list.get(i).getAlias();
+                        }
+                    }
+
+                    CoT_return type = new CoT_return(domain, item);
+
+                    String out_str = "<event version=\"2.0\" uid=\"satocot-v-"+version+"-harrissa-combatid-" + RMC_callsign(In) +
+                            "\" type=\"" + type + "\" time=\"" + convertDT_CoT(date, time) +
+                            "\" start=\"" + convertDT_CoT(date, time) + "\" stale=\"" + staleDT_CoT(date, time, Integer.parseInt(lbl_stale.getText())) +
+                            "\" how=\"m-g\">" +
+                            "<point lat=\"" + RMC_latitude(In) + "\" lon=\"" + RMC_longtitude(In) + "\" hae=\"25.0\" ce=\"5.0\" le=\"0.0\" />" +
+                            "<detail>" +
+                            "<contact callsign=\"" + alias + "\" />" +
+                            "<precisionlocation geopointsrc=\"Radio\" altsrc=\"Harris GPS\" />" +
+                            "<track speed=\"" + RMC_speed(In) + "\" course=\"" + RMC_course(In) + "\" />" +
+                            "</detail>" +
+                            "</event>";
+                    if (localSA == true) {
+                        send_udp(out_str, "127.0.0.1", "6969");
+                        addLog(" -> 127.0.0.1 port:6969");
+                    }
+                    if (multiSA == true && multicast_addr != null) {
+                        send_ms_udp(out_str, multicast_addr, "6969", 64);
+
+                        addLog(" -> " + multicast_addr + " port:6969");
+                    }
+                }
+                receive = new byte[65535]; // Clear the buffer after every message.
+            } else {
+                ds.close();
+                break;
+            }
+        }
     }
     // Harris SA converter code
 }
+

@@ -3,36 +3,46 @@ package SaToCoT;
 public class moto_sa_list {
 
     private String radioid;
-    private String team;
-    private String role;
+    private String domain;
+    private String item;
+    private String alias;
 
-    public moto_sa_list (String radioid, String team, String role) {
+    public moto_sa_list (String radioid, String domain, String item, String alias) {
         this.radioid = radioid;
-        this.team = team;
-        this.role = role;
+        this.domain = domain;
+        this.item = item;
+        this.alias = alias;
     }
 
     public String getRadioId() {
         return radioid;
     }
 
-    public String getTeam() {
-        return team;
+    public String getDomain() {
+        return domain;
     }
 
-    public String getRole() {
-        return role;
+    public String getItem() {
+        return item;
+    }
+
+    public String getAlias() {
+        return alias;
     }
 
     public void setRadioId(String radioid) {
         this.radioid = radioid;
     }
 
-    public void setTeam(String team) {
-        this.team = team;
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setItem(String item) {
+        this.item = item;
+    }
+
+    public void setAlias(String alias){
+        this.alias = alias;
     }
 }

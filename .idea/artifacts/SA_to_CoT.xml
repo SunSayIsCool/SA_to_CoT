@@ -3,11 +3,11 @@
     <output-path>$PROJECT_DIR$/out/artifacts/SA_to_CoT</output-path>
     <properties id="javafx-properties">
       <options>
-        <option name="appClass" value="sample.Main" />
+        <option name="appClass" value="SaToCoT.Main" />
         <option name="description" value="" />
         <option name="htmlPlaceholderId" value="" />
         <option name="nativeBundle" value="all" />
-        <option name="title" value="" />
+        <option name="title" value="SA to CoT Forwarder" />
         <option name="vendor" value="" />
         <option name="version" value="" />
       </options>
@@ -15,16 +15,8 @@
     <root id="root">
       <element id="archive" name="SA_to_CoT.jar">
         <element id="module-output" name="SA_to_CoT" />
-        <element id="file-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-11.0.2/lib/javafx-swt.jar" />
-        <element id="file-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-11.0.2/lib/javafx.base.jar" />
-        <element id="file-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-11.0.2/lib/javafx.controls.jar" />
-        <element id="file-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-11.0.2/lib/javafx.fxml.jar" />
-        <element id="file-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-11.0.2/lib/javafx.graphics.jar" />
-        <element id="file-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-11.0.2/lib/javafx.media.jar" />
-        <element id="file-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-11.0.2/lib/javafx.properties" />
-        <element id="file-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-11.0.2/lib/javafx.swing.jar" />
-        <element id="file-copy" path="$PROJECT_DIR$/../../../../javafx-sdk-11.0.2/lib/javafx.web.jar" />
       </element>
+      <element id="library" level="project" name="javafx-swt" />
     </root>
   </artifact>
 </component>

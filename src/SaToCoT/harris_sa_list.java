@@ -3,36 +3,46 @@ package SaToCoT;
 public class harris_sa_list {
 
     private String sign;
-    private String team;
-    private String role;
+    private String domain;
+    private String item;
+    private String alias;
 
-    public harris_sa_list (String sign, String team, String role) {
+    public harris_sa_list(String sign, String domain, String item, String alias) {
         this.sign = sign;
-        this.team = team;
-        this.role = role;
+        this.domain = domain;
+        this.item = item;
+        this.alias = alias;
     }
 
     public String getCallsign() {
         return sign;
     }
 
-    public String getTeam() {
-        return team;
+    public String getDomain() {
+        return domain;
     }
 
-    public String getRole() {
-        return role;
+    public String getItem() {
+        return item;
+    }
+
+    public String getAlias() {
+        return alias;
     }
 
     public void setCallsign(String sign) {
         this.sign = sign;
     }
 
-    public void setTeam(String team) {
-        this.team = team;
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setItem(String item) {
+        this.item = item;
+    }
+
+    public void setAlias(String alias){
+        this.alias = alias;
     }
 }
