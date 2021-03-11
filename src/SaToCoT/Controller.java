@@ -33,42 +33,6 @@ import java.util.Iterator;
 
 public class Controller {
 
-    private ObservableList<harris_sa_list> harris_list = FXCollections.observableArrayList();
-    private ObservableList<moto_sa_list> moto_list = FXCollections.observableArrayList();
-    private ObservableList<String> domain_list = FXCollections.observableArrayList("AIR CIV","AIR MIL","GROUND SENSORS","GROUND VEHICLE","GROUND WEAPON","GROUND UNIT COMBAT","GROUND UNIT SERVICE SUPPORT","GROUND UNIT COMBAT SUPPORT","SURFACE","SUBSURFACE","SOF");
-    private ObservableList<String> air_civ_list = FXCollections.observableArrayList("Air Civ", "Fixed", "Rotary", "Blimp");
-    private ObservableList<String> air_mil_list = FXCollections.observableArrayList("Fixed","Fixed/Attack","Fixed/Bomber","Fixed/Transport","Fixed/C2","Fixed/Fighter","Fixed/Interceptor","Fixed/CSAR","Fixed/Jammer",
-                                                                                           "Fixed/Tanker","Fixed/VSTOL","Fixed/SOF","Fixed/MEDEVAC","Fixed/Patrol","Fixed/UAV","Fixed/RECON","Fixed/Trainer","Fixed/Utility",
-                                                                                            "Fixed/C3I","Rotor","Rotor/Attack","Rotor/Transport","Rotor/C2","Rotor/CSAR","Rotor/Jammer","Rotor/SOF","Rotor/MEDEVAC","Rotor/UAV","Rotor/RECON","Rotor/Utility","Blimp");
-    private ObservableList<String> gnd_sens_list = FXCollections.observableArrayList("Sensor","Emplaced","Radar");
-    private ObservableList<String> gnd_vech_list = FXCollections.observableArrayList("Vehicle","Armor/Gun","Apc","Apc/Recovery","C2V/ACV","Armor/Infantry",
-                                                                                            "Armor/Light","Armor/Combat Service Support","Tank","Civilian","Engineer",
-                                                                                            "Mine Clearing Vehicle","Utility","Bus","Cross Country Truck","Boat","Semi","Ambulance");
-    private ObservableList<String> gnd_weap_list = FXCollections.observableArrayList("Weapon","Air Defense Gun","DirectFire","AnitTankGun","Howitzer","MissileLauncher",
-                                                                                            "Mortar","Rifle","Automatic Weapon","Light Machine Gun","Heavy Machine Gun",
-                                                                                            "RocketLauncher/Single","RocketLauncher/Multiple","RocketLauncher/AntiTank","Flame Thrower","Nbc Equipment");
-    private ObservableList<String> gnd_unt_cbt_list = FXCollections.observableArrayList("Combat","ARMOR","ANTI ARMOR","ANTI ARMOR, ARMORED AIR ASSAULT","ANTI ARMOR, ARMORED TRACKED",
-                                                                                                "ANTI ARMOR, ARMORED WHEELED","ANTI ARMOR, AIRBORNE","ANTI ARMOR, MOTORIZED","ARMOR TRACK","ARMOR TRACK AMPHIBIOUS",
-                                                                                                "ARMOR, WHEELED","ARMOR, WHEELED AIRBORNE","ARMOR, WHEELED RECOVERY","ARMOR, WHEELED AMPHIBIOUS","AIR DEFENSE","AIR DEFENSE MISSILE",
-                                                                                                "Engineer/ENGINEER","Artillery (Fixed)","MORTAR","ROCKET","SINGLE ROCKET SELF PROPELLED","MULTI ROCKET SELF PROPELLED","Infantry/Troops",
-                                                                                                "Infantry/Airborne","Infantry/Fighting Vehicle","Infantry/Motorized","Infantry/Naval","Infantry/Air Assault","Infantry/Mountain","Infantry/Mechanized",
-                                                                                                "MISSILE (SURF SURF)","Recon","Recon/AIRBORNE","Recon/MOUNTAIN","Recon/MARINE","Recon/AIR ASSAULT","INTERNAL SECURITY FORCES","Aviation/AVIATION",
-                                                                                                "Aviation/COMPOSITE","Aviation/FIXED WING","Aviation/ROTARY WING");
-    private ObservableList<String> gnd_unt_ss_list = FXCollections.observableArrayList("C2 HEADQUARTERS COMPONENT","MEDICAL","SUPPLY","TRANSPORTATION","MAINTENANCE","MAINTENANCE RECOVERY");
-    private ObservableList<String> gnd_unt_cs_list = FXCollections.observableArrayList("COMBAT SUPPORT","COMBAT SUPPORT NBC","BIOLOGICAL","CHEMICAL","NUCLEAR","EXPLOSIVE ORDINANCE DISPOSAL",
-                                                                                                "INFORMATION WARFARE UNIT","LAW ENFORCEMENT UNIT","CIVILIAN LAW ENFORCEMENT","MILITARY POLICE","MILITARY INTELLIGENCE",
-                                                                                                "COUNTER INTELLIGENCE","SIGNAL INTELLIGENCE (SIGINT)","ELECTRONIC WARFARE","SIGNAL UNIT","COMMAND OPERATIONS","RADIO UNIT",
-                                                                                                "TACTICAL SATELLITE","RELAY","TELEPHONE SWITCH");
-    private ObservableList<String> sfc_list = FXCollections.observableArrayList("SEA SURFACE TRACK","COMBATANT","AMPHIBIOUS WARFARE SHIP","ASSAULT VESSEL","LANDING CRAFT",
-                                                                                        "LANDING SHIP","HOVERCRAFT","LINE","BATTLESHIP","CRUISER","CARRIER","DESTROYER","FRIGATE/CORVETTE",
-                                                                                        "MINE WARFARE VESSEL","MINEHUNTER","MINELAYER","PATROL","ANTISUBMARINE WARFARE","ANTISURFACE WARFARE",
-                                                                                        "CONVOY","HOSPITAL SHIP","RESCUE","NON MILITARY","CARGO","PASSENGER","TANKER");
-    private ObservableList<String> sub_sfc_list = FXCollections.observableArrayList("SUBSURFACE TRACK","DIVER","SUBMARINE","SUBMARINE CONVENTIONAL PROPULSION","SUBMARINE NUCLEAR PROPULSION","UNMANNED UNDERWATER VEHICLE (UUV)");
-    private ObservableList<String> sof_list = FXCollections.observableArrayList("AVIATION Fixed","AVIATION Rotary","AVIATION CSAR","NAVAL","SPECIAL BOAT","SPECIAL SSNR","GROUND","RANGER","PSYOPS","SUPPORT");
-
-
-
-
     @FXML
     private TableView<harris_sa_list> harris_sa_tbl_view;
 
@@ -167,6 +131,21 @@ public class Controller {
 
     @FXML
     private TextField moto_alias_txt;
+
+    private ObservableList<harris_sa_list> harris_list = FXCollections.observableArrayList();
+    private ObservableList<moto_sa_list> moto_list = FXCollections.observableArrayList();
+    private ObservableList<String> domain_list = FXCollections.observableArrayList("AIR CIV","AIR MIL","GROUND SENSORS","GROUND VEHICLE","GROUND WEAPON","GROUND UNIT COMBAT","GROUND UNIT SERVICE SUPPORT","GROUND UNIT COMBAT SUPPORT","SURFACE","SUBSURFACE","SOF");
+    private ObservableList<String> air_civ_list = FXCollections.observableArrayList("Air Civ", "Fixed", "Rotary", "Blimp");
+    private ObservableList<String> air_mil_list = FXCollections.observableArrayList("Fixed","Fixed/Attack","Fixed/Bomber","Fixed/Transport","Fixed/C2","Fixed/Fighter","Fixed/Interceptor","Fixed/CSAR","Fixed/Jammer","Fixed/Tanker","Fixed/VSTOL","Fixed/SOF","Fixed/MEDEVAC","Fixed/Patrol","Fixed/UAV","Fixed/RECON","Fixed/Trainer","Fixed/Utility","Fixed/C3I","Rotor","Rotor/Attack","Rotor/Transport","Rotor/C2","Rotor/CSAR","Rotor/Jammer","Rotor/SOF","Rotor/MEDEVAC","Rotor/UAV","Rotor/RECON","Rotor/Utility","Blimp");
+    private ObservableList<String> gnd_sens_list = FXCollections.observableArrayList("Sensor","Emplaced","Radar");
+    private ObservableList<String> gnd_vech_list = FXCollections.observableArrayList("Vehicle","Armor/Gun","Apc","Apc/Recovery","C2V/ACV","Armor/Infantry","Armor/Light","Armor/Combat Service Support","Tank","Civilian","Engineer","Mine Clearing Vehicle","Utility","Bus","Cross Country Truck","Boat","Semi","Ambulance");
+    private ObservableList<String> gnd_weap_list = FXCollections.observableArrayList("Weapon","Air Defense Gun","DirectFire","AnitTankGun","Howitzer","MissileLauncher","Mortar","Rifle","Automatic Weapon","Light Machine Gun","Heavy Machine Gun","RocketLauncher/Single","RocketLauncher/Multiple","RocketLauncher/AntiTank","Flame Thrower","Nbc Equipment");
+    private ObservableList<String> gnd_unt_cbt_list = FXCollections.observableArrayList("Combat","ARMOR","ANTI ARMOR","ANTI ARMOR, ARMORED AIR ASSAULT","ANTI ARMOR, ARMORED TRACKED","ANTI ARMOR, ARMORED WHEELED","ANTI ARMOR, AIRBORNE","ANTI ARMOR, MOTORIZED","ARMOR TRACK","ARMOR TRACK AMPHIBIOUS","ARMOR, WHEELED","ARMOR, WHEELED AIRBORNE","ARMOR, WHEELED RECOVERY","ARMOR, WHEELED AMPHIBIOUS","AIR DEFENSE","AIR DEFENSE MISSILE","Engineer/ENGINEER","Artillery (Fixed)","MORTAR","ROCKET","SINGLE ROCKET SELF PROPELLED","MULTI ROCKET SELF PROPELLED","Infantry/Troops","Infantry/Airborne","Infantry/Fighting Vehicle","Infantry/Motorized","Infantry/Naval","Infantry/Air Assault","Infantry/Mountain","Infantry/Mechanized","MISSILE (SURF SURF)","Recon","Recon/AIRBORNE","Recon/MOUNTAIN","Recon/MARINE","Recon/AIR ASSAULT","INTERNAL SECURITY FORCES","Aviation/AVIATION","Aviation/COMPOSITE","Aviation/FIXED WING","Aviation/ROTARY WING");
+    private ObservableList<String> gnd_unt_ss_list = FXCollections.observableArrayList("C2 HEADQUARTERS COMPONENT","MEDICAL","SUPPLY","TRANSPORTATION","MAINTENANCE","MAINTENANCE RECOVERY");
+    private ObservableList<String> gnd_unt_cs_list = FXCollections.observableArrayList("COMBAT SUPPORT","COMBAT SUPPORT NBC","BIOLOGICAL","CHEMICAL","NUCLEAR","EXPLOSIVE ORDINANCE DISPOSAL","INFORMATION WARFARE UNIT","LAW ENFORCEMENT UNIT","CIVILIAN LAW ENFORCEMENT","MILITARY POLICE","MILITARY INTELLIGENCE","COUNTER INTELLIGENCE","SIGNAL INTELLIGENCE (SIGINT)","ELECTRONIC WARFARE","SIGNAL UNIT","COMMAND OPERATIONS","RADIO UNIT","TACTICAL SATELLITE","RELAY","TELEPHONE SWITCH");
+    private ObservableList<String> sfc_list = FXCollections.observableArrayList("SEA SURFACE TRACK","COMBATANT","AMPHIBIOUS WARFARE SHIP","ASSAULT VESSEL","LANDING CRAFT","LANDING SHIP","HOVERCRAFT","LINE","BATTLESHIP","CRUISER","CARRIER","DESTROYER","FRIGATE/CORVETTE","MINE WARFARE VESSEL","MINEHUNTER","MINELAYER","PATROL","ANTISUBMARINE WARFARE","ANTISURFACE WARFARE","CONVOY","HOSPITAL SHIP","RESCUE","NON MILITARY","CARGO","PASSENGER","TANKER");
+    private ObservableList<String> sub_sfc_list = FXCollections.observableArrayList("SUBSURFACE TRACK","DIVER","SUBMARINE","SUBMARINE CONVENTIONAL PROPULSION","SUBMARINE NUCLEAR PROPULSION","UNMANNED UNDERWATER VEHICLE (UUV)");
+    private ObservableList<String> sof_list = FXCollections.observableArrayList("AVIATION Fixed","AVIATION Rotary","AVIATION CSAR","NAVAL","SPECIAL BOAT","SPECIAL SSNR","GROUND","RANGER","PSYOPS","SUPPORT");
 
     Boolean l; //send local sa or not
     Boolean m; //send multicast sa or not
@@ -756,7 +735,7 @@ public class Controller {
 
             String domain = " ";
             String item = " ";
-            String alias = "N/A";
+
             if (status_lbl.getText().equals("Forwarder runned")) {
 
                 String multicast_addr = mcast_addr_txfld.getText().toString();
@@ -778,6 +757,7 @@ public class Controller {
                     String timestamp = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
                     String In = str;
 
+                    String alias = RMC_callsign(In);
                     addLog(" - Received: from " + RMC_callsign(In) + ": " + In);
                     String date = RMC_date(In);
                     String time = RMC_time(In);
