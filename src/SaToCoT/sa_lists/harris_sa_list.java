@@ -1,21 +1,21 @@
-package SaToCoT;
+package SaToCoT.sa_lists;
 
-public class moto_sa_list {
+public class harris_sa_list {
 
-    private String radioid;
+    private String sign;
     private String domain;
     private String item;
     private String alias;
 
-    public moto_sa_list (String radioid, String domain, String item, String alias) {
-        this.radioid = radioid;
+    public harris_sa_list(String sign, String domain, String item, String alias) {
+        this.sign = sign;
         this.domain = domain;
         this.item = item;
         this.alias = alias;
     }
 
-    public String getRadioId() {
-        return radioid;
+    public String getCallsign() {
+        return sign;
     }
 
     public String getDomain() {
@@ -30,8 +30,8 @@ public class moto_sa_list {
         return alias;
     }
 
-    public void setRadioId(String radioid) {
-        this.radioid = radioid;
+    public void setCallsign(String sign) {
+        this.sign = sign;
     }
 
     public void setDomain(String domain) {
