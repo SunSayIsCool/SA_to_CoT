@@ -1,37 +1,40 @@
-package SaToCoT;
+package SaToCoT.Controllers;
 
+import SaToCoT.*;
+import SaToCoT.CoT_engine.CoT_output;
+import SaToCoT.CoT_engine.CoT_return;
+import SaToCoT.Harris_engine.HarrisSaParser;
+import SaToCoT.Moto_engine.ImmediateLocation;
+import SaToCoT.sa_lists.harris_sa_list;
+import SaToCoT.sa_lists.moto_sa_list;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Slider;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.ScheduledService;
 import javafx.concurrent.Task;
-import javafx.scene.paint.Color;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.*;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
-import java.text.ParseException;
+import java.net.*;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Iterator;
+import java.util.*;
 
-public class Controller {
+public class Controller implements Initializable {
 
     @FXML
     private TableView<harris_sa_list> harris_sa_tbl_view;
@@ -109,10 +112,10 @@ public class Controller {
     private Button apply_btn;
 
     @FXML
-    private Button start_stop_btn;
+    private Button harris_cot_id;
 
     @FXML
-    private Label status_lbl;
+    private ToggleButton start_stop_btn;
 
     @FXML
     private Button log_save_btn;
@@ -132,6 +135,19 @@ public class Controller {
     @FXML
     private TextField moto_alias_txt;
 
+    @FXML
+    private ImageView img_on_air;
+
+    @FXML
+    private TabPane tab_pane;
+
+    @FXML
+    private ToggleButton btn_eng;
+
+    @FXML
+    private ToggleButton btn_ukr;
+
+
     private ObservableList<harris_sa_list> harris_list = FXCollections.observableArrayList();
     private ObservableList<moto_sa_list> moto_list = FXCollections.observableArrayList();
     private ObservableList<String> domain_list = FXCollections.observableArrayList("AIR CIV","AIR MIL","GROUND SENSORS","GROUND VEHICLE","GROUND WEAPON","GROUND UNIT COMBAT","GROUND UNIT SERVICE SUPPORT","GROUND UNIT COMBAT SUPPORT","SURFACE","SUBSURFACE","SOF");
@@ -149,165 +165,47 @@ public class Controller {
 
     Boolean l; //send local sa or not
     Boolean m; //send multicast sa or not
-    String version = "1.1";
+    String version = "1.2";
+    private Stage stage;
 
-    @FXML
-    void initialize() throws IOException, FileNotFoundException {
-
-        String timestamp = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-        String timestamp_file = new SimpleDateFormat("HHmm_dd-MM-yyyy").format(new Date());
-
-        //logging to textarea
-        Platform.runLater(() -> {log_tx.appendText("-------------------------[" + timestamp + "]-------------------------");});
-        addLog(" - App started"); //logging to console
-
-        //Initializing tables and comboboxes
-        initData();
-        readCSV();
-
-        // Stale slider listener
-        sld_stale.valueProperty().addListener(new ChangeListener<Number>() {
-
-            public void changed(ObservableValue<? extends Number> changed, Number oldValue, Number newValue) {
-                int stale_int = newValue.intValue();
-                lbl_stale.setText(String.valueOf(stale_int));
-            }
-        });
-
-        //Setting choose of harris rows
-        TableView.TableViewSelectionModel<harris_sa_list> selectionModel = harris_sa_tbl_view.getSelectionModel();
-        selectionModel.selectedItemProperty().addListener(new ChangeListener<harris_sa_list>() {
-            @Override
-            public void changed(ObservableValue<? extends harris_sa_list> val, harris_sa_list oldVal, harris_sa_list newVal) {
-                if (newVal != null) {
-                    harris_sign_txt.setText(newVal.getCallsign());
-                    harris_domain_cb.setValue(newVal.getDomain());
-                    harris_unit_cb.setValue(newVal.getItem());
-                    harris_alias_txt.setText(newVal.getAlias());
-                }
-
-            }
-        });
-        //-------------------
-
-        //Setting choose of harris rows
-        TableView.TableViewSelectionModel<moto_sa_list> selectionModel_moto = moto_sa_tbl_view.getSelectionModel();
-        selectionModel_moto.selectedItemProperty().addListener(new ChangeListener<moto_sa_list>() {
-            @Override
-            public void changed(ObservableValue<? extends moto_sa_list> val, moto_sa_list oldVal, moto_sa_list newVal) {
-                if (newVal != null) {
-                    moto_radioid_txt.setText(newVal.getRadioId());
-                    moto_domain_cb.setValue(newVal.getDomain());
-                    moto_unit_cb.setValue(newVal.getItem());
-                    moto_alias_txt.setText(newVal.getAlias());
-                }
-
-            }
-        });
-        //-------------------
-
-        //Add/modify Harris SA list
-        harris_add_btn.setOnAction(ActionEvent -> {
-            harris_list.add(new harris_sa_list(harris_sign_txt.getText(), harris_domain_cb.getValue(), harris_unit_cb.getValue(), harris_alias_txt.getText()));
-            try {
-                save_db_harris();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        });
-
-        //Add/modify MotoTRBO SA list
-        moto_add_btn.setOnAction(ActionEvent -> {
-            moto_list.add(new moto_sa_list(moto_radioid_txt.getText(), moto_domain_cb.getValue(), moto_unit_cb.getValue(), moto_alias_txt.getText()));
-            try {
-                save_db_moto();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        });
-        //-------------------
-
-        //Delete Harris SA item
-        harris_del_btn.setOnAction(ActionEvent -> {
-            harris_sa_tbl_view.getItems().removeAll(harris_sa_tbl_view.getSelectionModel().getSelectedItems());
-            try {
-                save_db_harris();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        //-------------------
-
-        //Delete MotoTRBO SA item
-        moto_del_btn.setOnAction(ActionEvent -> {
-            moto_sa_tbl_view.getItems().removeAll(moto_sa_tbl_view.getSelectionModel().getSelectedItems());
-            try {
-                save_db_moto();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-        //-------------------
-
-        //Processing start/stop forwarder service
-        start_stop_btn.setOnAction(actionEvent -> {
-
-            if (start_stop_btn.getText().equals("Start")) {
-                l = local_fw_chkbx.isSelected();
-                m = mcast_fwd_chkbx.isSelected();
-                start_stop_btn.setText("Stop");
-                status_lbl.setText("Forwarder runned");
-                status_lbl.setTextFill(Color.web("#808000"));
-                addLog(" - Forwarder started");
-
-            } else if (start_stop_btn.getText().equals("Stop")) {
-                l = false;
-                m = false;
-                start_stop_btn.setText("Start");
-                status_lbl.setText("Forwarder stopped");
-                status_lbl.setTextFill(Color.web("#FF0000"));
-                addLog(" - Forwarder stopped (receiving last packets)");
-
-            }
-
-            try {
-                recieve_UDP();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        });
-        //-------------------
-
-        //Clearing log TextView
-        log_clear_btn.setOnAction(ActionEvent -> {
-            log_tx.clear();
-        });
-        //-------------------
-
-        //Saving log to file
-        log_save_btn.setOnAction(ActionEvent -> {
-            try {
-                ObservableList<CharSequence> paragraph = log_tx.getParagraphs();
-                Iterator<CharSequence> iter = paragraph.iterator();
-                BufferedWriter bf = new BufferedWriter(new FileWriter(new File("log_[" + timestamp_file + "].log")));
-                while (iter.hasNext()) {
-                    CharSequence seq = iter.next();
-                    bf.append(seq);
-                    bf.newLine();
-                }
-                bf.flush();
-                bf.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        });
-        //-------------------
+    public void setStage(Stage mainStage) {
+        this.stage = mainStage;
     }
 
-    private void initData() {
+    public void showCOTinput(ActionEvent actionEvent) {
+        try {
+            FXMLLoader CoTreqLoader = new FXMLLoader();
+            CoTreqLoader.setLocation(getClass().getResource("../fxml/harris_cot_input.fxml"));
+            CoTreqLoader.setResources(ResourceBundle.getBundle("SaToCoT.locale", new Locale("en")));
+            Stage stage = new Stage();
+            Parent root = CoTreqLoader.load();
+            CoTinputController cotinputcontroller = CoTreqLoader.getController();
+            cotinputcontroller.setStage(stage);
+            stage.setTitle("Choose CoT Icon");
+            stage.getIcons().add(new Image(Main.class.getResourceAsStream("assets/l3harris.png")));
+            stage.setResizable(false);
+            stage.setScene(new Scene(root, 600, 400));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.initOwner(((Node)actionEvent.getSource()).getScene().getWindow());
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initData() throws IOException, InterruptedException{
+        //Moto LRRP
+        //Thread Location_Connection = new Thread(new LRRPmsg());
+        //Location_Connection.start();
+        //IMR();
+
+        // Hide MotoSA Tab
+        tab_pane.getTabs().remove(1);
+        // Set lang Toggle group
+        ToggleGroup lang_group = new ToggleGroup();
+        btn_eng.setToggleGroup(lang_group);
+        btn_ukr.setToggleGroup(lang_group);
+
         //Initializing Harris SA table
         harris_domain_cb.setItems(domain_list);
         harris_unit_cb.setItems(air_civ_list);
@@ -510,7 +408,7 @@ public class Controller {
     //-------------------
 
     @FXML
-    private void recieve_UDP() throws IOException { //Forwarder for Harris SA service
+    private void harris_engine_start() throws IOException { //Forwarder for Harris SA service
 
         ScheduledService<Boolean> ss = new ScheduledService<Boolean>() {
             @Override
@@ -518,217 +416,29 @@ public class Controller {
                 Task<Boolean> task = new Task<Boolean>() {
                     @Override
                     protected Boolean call() throws IOException {
-                        HarrisSAsendCoT();
+                        HarrisSaSendCoT();
                         return true;
                     }
-
-                    ;
                 };
                 return task;
             }
         };
         ss.start();
     }
-    //-------------------
-
-    public String checksumm(String input_str) {
-        int checksum = 0;
-        for (int i = 0; i < input_str.length(); i++) {
-            checksum = checksum ^ input_str.charAt(i);
-        }
-        return Integer.toHexString(checksum).toUpperCase();
-
-    }
-
-    public String RMC_string(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-        return strMain.split("\\$|\\*")[1];
-
-    }
-
-    public String RMC_callsign(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-        String gprmc_str = strMain.split("\\$|\\*")[1];
-        String callsign_gprmc = arrSplit[0].split("\\$")[0];
-        return callsign_gprmc.substring(1, callsign_gprmc.length() - 1);
-
-    }
-
-    public String RMC_time(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-
-        return arrSplit[1];
-
-    }
-
-    public char RMC_valid(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-        return arrSplit[2].charAt(0);
-
-    }
-
-    public String RMC_latitude(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-        float dd = Float.parseFloat(arrSplit[3].substring(0, 2));
-        float mm = Float.parseFloat(arrSplit[3].substring(2, 4));
-        float ss = Float.parseFloat("0" + arrSplit[3].substring(4, arrSplit[3].length()));
-        float dddd = dd + mm / 60 + ss * 60 / 3600;
-        switch (arrSplit[4].charAt(0)) {
-            case 'N':
-                dddd = dddd;
-                break;
-            case 'S':
-                dddd = 0 - dddd;
-                break;
-        }
-        return Float.toString(dddd);
-
-    }
-
-    public String RMC_longtitude(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-        float dd = Float.parseFloat(arrSplit[5].substring(0, 3));
-        float mm = Float.parseFloat(arrSplit[5].substring(3, 5));
-        float ss = Float.parseFloat("0" + arrSplit[5].substring(5, arrSplit[5].length()));
-        float dddd = dd + mm / 60 + ss * 60 / 3600;
-        switch (arrSplit[6].charAt(0)) {
-            case 'E':
-                dddd = dddd;
-                break;
-            case 'W':
-                dddd = 0 - dddd;
-                break;
-        }
-        return Float.toString(dddd);
-
-    }
-
-    public String RMC_speed(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-        float ms = Float.parseFloat(arrSplit[7]);
-        ms = ms * 0.514444F;
-        return Float.toString(ms);
-
-    }
-
-    public String RMC_course(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-        return arrSplit[8];
-
-    }
-
-    public String RMC_date(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-        return arrSplit[9];
-    }
-
-    public String chksum_callsign(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-        String callsign_chksum = arrSplit[11].split("\\*")[1];
-        return callsign_chksum.substring(2, callsign_chksum.length());
-
-    }
-
-    public String RMC_chksum(String strMain) {
-
-        String[] arrSplit = strMain.split(",");
-        String callsign_chksum = arrSplit[11].split("\\*")[1];
-        String chksum = callsign_chksum.substring(0, 2);
-        return callsign_chksum.substring(0, 2);
-
-    }
-
-    public String convertDT_CoT(String inputDate, String inputTime) {
-
-        String DateTime = inputDate + inputTime;
-        Calendar c = Calendar.getInstance();
-        try {
-            Date date = new SimpleDateFormat("ddMMyyHHmmss").parse(DateTime);
-            DateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(date);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return DateTime;
-    }
-
-    public String staleDT_CoT(String inputDate, String inputTime, Integer inputStale) {
-
-        String DateTime = inputDate + inputTime;
-        Calendar c = Calendar.getInstance();
-
-        try {
-            Date date = new SimpleDateFormat("ddMMyyHHmmss").parse(DateTime);
-            c.setTime(date);
-            c.add(Calendar.MINUTE, inputStale);
-            Date currentDatePlusOne = c.getTime();
-            DateTime = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").format(currentDatePlusOne);
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return DateTime;
-    }
-
-    public void send_udp(String input_str, String ip_addr, String port) {
-        try {
-            DatagramSocket ds = new DatagramSocket();
-
-            InetAddress ip = InetAddress.getByName(ip_addr);
-            int udp_port = Integer.parseInt(port);
-            byte buf[] = null;
-            buf = input_str.getBytes();
-            DatagramPacket DpSend = new DatagramPacket(buf, buf.length, ip, udp_port);
-            ds.send(DpSend);
-            ds.close();
-        } catch (IOException ex) {
-            System.out.println("Local error: " + ex.getMessage());
-            ex.printStackTrace();
-        }
-    }
-
-    public void send_ms_udp(String input_str, String ip_addr, String port, int ttl) {
-        try{
-            int udp_port = Integer.parseInt(port);
-            Integer ttlByte = new Integer(ttl);
-            MulticastSocket mcast_sock = new MulticastSocket();
-            byte buf[] = null;
-            buf = input_str.getBytes();
-            DatagramPacket mc_Send = new DatagramPacket(buf, buf.length, InetAddress.getByName(ip_addr), udp_port);
-            mcast_sock.send(mc_Send, ttlByte.byteValue());
-            mcast_sock.close();
-        } catch (IOException ex) {
-            System.out.println("Multicast error: " + ex.getMessage());
-            ex.printStackTrace();
-        }
-
-    }
-
-    public void addLog (String message) {
-        String timestamp = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
-        System.out.println("[" + timestamp + "]" + message);
-        Platform.runLater(() -> {log_tx.appendText("\n[" + timestamp + "]" + message);});
-    }
 
     // Harris SA converter code
     @FXML
-    public void HarrisSAsendCoT() throws IOException {
+    public void HarrisSaSendCoT() throws IOException {
 
         // Create a socket to listen at port
         DatagramSocket ds = new DatagramSocket(10011);
         byte[] receive = new byte[65535];
 
         DatagramPacket DpReceive = null;
+
+        HarrisSaParser harris_parser = new HarrisSaParser();
+        NetSender sender = new NetSender();
+
         while (true) {
             Boolean localSA = l;
             Boolean multiSA = m;
@@ -736,7 +446,7 @@ public class Controller {
             String domain = " ";
             String item = " ";
 
-            if (status_lbl.getText().equals("Forwarder runned")) {
+            if (start_stop_btn.isSelected()) {
 
                 String multicast_addr = mcast_addr_txfld.getText().toString();
 
@@ -757,13 +467,13 @@ public class Controller {
                     String timestamp = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
                     String In = str;
 
-                    String alias = RMC_callsign(In);
-                    addLog(" - Received: from " + RMC_callsign(In) + ": " + In);
-                    String date = RMC_date(In);
-                    String time = RMC_time(In);
+                    String alias = harris_parser.RMC_callsign(In);
+                    String date = harris_parser.RMC_date(In);
+                    String time = harris_parser.RMC_time(In);
+                    addLog(" - Received: Callsign{" + harris_parser.RMC_callsign(In) + "}Date{" + date + "}Time{" + time + "}Lat{" + harris_parser.RMC_latitude(In) + "}Long{" + harris_parser.RMC_longtitude(In) + "}Course{" + harris_parser.RMC_course(In) + "}Speed{" + harris_parser.RMC_speed(In) + "}");
 
                     for (Integer i = 0; i < harris_list.size(); i++) {
-                        if (RMC_callsign(In).equals(harris_list.get(i).getCallsign())) {
+                        if (harris_parser.RMC_callsign(In).equals(harris_list.get(i).getCallsign())) {
                             domain = harris_list.get(i).getDomain();
                             item = harris_list.get(i).getItem();
                             alias = harris_list.get(i).getAlias();
@@ -771,24 +481,17 @@ public class Controller {
                     }
 
                     CoT_return type = new CoT_return(domain, item);
+                    CoT_output cot_output = new CoT_output();
 
-                    String out_str = "<event version=\"2.0\" uid=\"satocot-v-"+version+"-harrissa-combatid-" + RMC_callsign(In) +
-                            "\" type=\"" + type + "\" time=\"" + convertDT_CoT(date, time) +
-                            "\" start=\"" + convertDT_CoT(date, time) + "\" stale=\"" + staleDT_CoT(date, time, Integer.parseInt(lbl_stale.getText())) +
-                            "\" how=\"m-g\">" +
-                            "<point lat=\"" + RMC_latitude(In) + "\" lon=\"" + RMC_longtitude(In) + "\" hae=\"25.0\" ce=\"5.0\" le=\"0.0\" />" +
-                            "<detail>" +
-                            "<contact callsign=\"" + alias + "\" />" +
-                            "<precisionlocation geopointsrc=\"Radio\" altsrc=\"Harris GPS\" />" +
-                            "<track speed=\"" + RMC_speed(In) + "\" course=\"" + RMC_course(In) + "\" />" +
-                            "</detail>" +
-                            "</event>";
+                    String out_str = cot_output.CoT_output("harris", harris_parser.RMC_callsign(In), type.toString(), harris_parser.convertDT_CoT(date, time),harris_parser.convertDT_CoT(date, time),
+                            harris_parser.staleDT_CoT(date, time, Integer.parseInt(lbl_stale.getText())),
+                            harris_parser.RMC_latitude(In),harris_parser.RMC_longtitude(In), alias,harris_parser.RMC_speed(In), harris_parser.RMC_course(In));
                     if (localSA == true) {
-                        send_udp(out_str, "127.0.0.1", "6969");
+                        sender.send_udp(out_str, "127.0.0.1", "6969");
                         addLog(" -> 127.0.0.1 port:6969");
                     }
                     if (multiSA == true && multicast_addr != null) {
-                        send_ms_udp(out_str, multicast_addr, "6969", 64);
+                        sender.send_ms_udp(out_str, multicast_addr, "6969", 64);
 
                         addLog(" -> " + multicast_addr + " port:6969");
                     }
@@ -801,5 +504,205 @@ public class Controller {
         }
     }
     // Harris SA converter code
+
+    // MotoTRBO converter code
+    public void IMR() throws IOException, InterruptedException {
+        String latlng;
+        System.out.println("IMR Request Clicked!");
+        int RadioID = 78170;
+        latlng = ImmediateLocation.request(RadioID);
+        System.out.println("LatLong " + latlng + "\n");
+    }
+
+    public void MotoSAsendCoT() throws IOException, InterruptedException {
+        //IMR();
+    }
+
+    // Logging engine
+    public void addLog (String message) {
+        String timestamp = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss").format(new Date());
+        String out_log = "[" + timestamp + "]" + message;
+        System.out.println(out_log);
+        Platform.runLater(() -> {log_tx.appendText("\n" + out_log);});
+    }
+
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+
+        // initialising CoT change button
+        Image imageOk = new Image(getClass().getResourceAsStream("../assets/ms_2525_fr/sfap-----------.png"));
+        harris_cot_id.graphicProperty().setValue(new ImageView(imageOk));
+
+        //
+
+        String timestamp = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+        String timestamp_file = new SimpleDateFormat("HHmm_dd-MM-yyyy").format(new Date());
+
+        //logging to textarea
+        Platform.runLater(() -> {log_tx.appendText("-------------------------[" + timestamp + "]-------------------------");});
+        addLog(" - App started"); //logging to console
+
+        //Initializing tables and comboboxes
+        try {
+            initData();
+            readCSV();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (InterruptedException f) {
+            f.printStackTrace();
+        }
+
+        // Stale slider listener
+        sld_stale.valueProperty().addListener(new ChangeListener<Number>() {
+
+            public void changed(ObservableValue<? extends Number> changed, Number oldValue, Number newValue) {
+                int stale_int = newValue.intValue();
+                lbl_stale.setText(String.valueOf(stale_int));
+            }
+        });
+
+        //Setting choose of harris rows
+        TableView.TableViewSelectionModel<harris_sa_list> selectionModel = harris_sa_tbl_view.getSelectionModel();
+        selectionModel.selectedItemProperty().addListener(new ChangeListener<harris_sa_list>() {
+            @Override
+            public void changed(ObservableValue<? extends harris_sa_list> val, harris_sa_list oldVal, harris_sa_list newVal) {
+                if (newVal != null) {
+                    harris_sign_txt.setText(newVal.getCallsign());
+                    harris_domain_cb.setValue(newVal.getDomain());
+                    harris_unit_cb.setValue(newVal.getItem());
+                    harris_alias_txt.setText(newVal.getAlias());
+                }
+
+            }
+        });
+        //-------------------
+
+        //Setting choose of harris rows
+        TableView.TableViewSelectionModel<moto_sa_list> selectionModel_moto = moto_sa_tbl_view.getSelectionModel();
+        selectionModel_moto.selectedItemProperty().addListener(new ChangeListener<moto_sa_list>() {
+            @Override
+            public void changed(ObservableValue<? extends moto_sa_list> val, moto_sa_list oldVal, moto_sa_list newVal) {
+                if (newVal != null) {
+                    moto_radioid_txt.setText(newVal.getRadioId());
+                    moto_domain_cb.setValue(newVal.getDomain());
+                    moto_unit_cb.setValue(newVal.getItem());
+                    moto_alias_txt.setText(newVal.getAlias());
+                }
+
+            }
+        });
+        //-------------------
+
+        //Add/modify Harris SA list
+        harris_add_btn.setOnAction(ActionEvent -> {
+            harris_list.add(new harris_sa_list(harris_sign_txt.getText(), harris_domain_cb.getValue(), harris_unit_cb.getValue(), harris_alias_txt.getText()));
+            try {
+                save_db_harris();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
+
+        //Add/modify MotoTRBO SA list
+        moto_add_btn.setOnAction(ActionEvent -> {
+            moto_list.add(new moto_sa_list(moto_radioid_txt.getText(), moto_domain_cb.getValue(), moto_unit_cb.getValue(), moto_alias_txt.getText()));
+            try {
+                save_db_moto();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        });
+        //-------------------
+
+        //Delete Harris SA item
+        harris_del_btn.setOnAction(ActionEvent -> {
+            harris_sa_tbl_view.getItems().removeAll(harris_sa_tbl_view.getSelectionModel().getSelectedItems());
+            try {
+                save_db_harris();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        //-------------------
+
+        //Delete MotoTRBO SA item
+        moto_del_btn.setOnAction(ActionEvent -> {
+            moto_sa_tbl_view.getItems().removeAll(moto_sa_tbl_view.getSelectionModel().getSelectedItems());
+            try {
+                save_db_moto();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        //-------------------
+
+        //Processing start/stop forwarder service
+        start_stop_btn.setOnAction(actionEvent -> {
+            Image on = new Image(getClass().getResourceAsStream("../assets/btn_img/on_air_on.png"));
+            Image off = new Image(getClass().getResourceAsStream("../assets/btn_img/on_air_off.png"));
+            if (start_stop_btn.getText().equals("Start")) {
+                l = local_fw_chkbx.isSelected();
+                m = mcast_fwd_chkbx.isSelected();
+                img_on_air.setImage(on);
+                start_stop_btn.setText("Stop");
+                addLog(" - Forwarder started");
+                try {
+                    harris_engine_start();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    MotoSAsendCoT();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+            } else if (start_stop_btn.getText().equals("Stop")) {
+                l = false;
+                m = false;
+                img_on_air.setImage(off);
+                start_stop_btn.setText("Start");
+                addLog(" - Forwarder stopped (receiving last packets)");
+
+            }
+
+
+
+        });
+        //-------------------
+
+        //Clearing log TextView
+        log_clear_btn.setOnAction(ActionEvent -> {
+            log_tx.clear();
+        });
+        //-------------------
+
+        //Saving log to file
+        log_save_btn.setOnAction(ActionEvent -> {
+            try {
+                ObservableList<CharSequence> paragraph = log_tx.getParagraphs();
+                Iterator<CharSequence> iter = paragraph.iterator();
+                BufferedWriter bf = new BufferedWriter(new FileWriter(new File("log_[" + timestamp_file + "].log")));
+                while (iter.hasNext()) {
+                    CharSequence seq = iter.next();
+                    bf.append(seq);
+                    bf.newLine();
+                }
+                bf.flush();
+                bf.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+        //-------------------
+
+    }
+
+    // MotoTRBO converter code
+
 }
 

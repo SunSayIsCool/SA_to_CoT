@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ResourceBundleManager">
+    <file url="file://$PROJECT_DIR$/src/SaToCoT/locale_en.properties" />
+    <file url="file://$PROJECT_DIR$/src/SaToCoT/locale_uk.properties" />
+    <file url="file://$PROJECT_DIR$/src/SaToCoT/locales.properties" />
+    <file url="file://$PROJECT_DIR$/src/SaToCoT/locales_uk.properties" />
+    <custom-resource-bundle>
+      <file value="file://$PROJECT_DIR$/src/SaToCoT/locales.properties" />
+      <file value="file://$PROJECT_DIR$/src/SaToCoT/locales_uk.properties" />
+      <base-name>locales</base-name>
+    </custom-resource-bundle>
+    <custom-resource-bundle>
+      <file value="file://$PROJECT_DIR$/src/SaToCoT/locale.properties" />
+      <file value="file://$PROJECT_DIR$/src/SaToCoT/locale_en.properties" />
+      <file value="file://$PROJECT_DIR$/src/SaToCoT/locale_uk.properties" />
+      <base-name>locale</base-name>
+    </custom-resource-bundle>
+  </component>
+</project>

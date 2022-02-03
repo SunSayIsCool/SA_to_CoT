@@ -1,13 +1,12 @@
-package SaToCoT;
+package SaToCoT.sa_lists;
 
-public class harris_sa_list {
-
+public class adsb_sa_list {
     private String sign;
     private String domain;
     private String item;
     private String alias;
 
-    public harris_sa_list(String sign, String domain, String item, String alias) {
+    public adsb_sa_list(String sign, String domain, String item, String alias) {
         this.sign = sign;
         this.domain = domain;
         this.item = item;
